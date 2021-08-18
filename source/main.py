@@ -1,8 +1,4 @@
-import pysat_solution
+from UI import GUI
 
 if __name__ == '__main__':
-    pysat_solution.solve()
-
-# from UI import GUI
-
-# GUI()
+    GUI()

@@ -1,7 +1,7 @@
 import copy
 from pysat.solvers import Glucose3
-from utilities.combination_algorithms import generate_combination
-import utilities.utility_funcs as util_funcs
+from utilities.combination_algos import generate_combination
+from utilities import util_funcs
 
 
 def mark_all_zero(matrix):
@@ -22,14 +22,16 @@ def mark_all_zero(matrix):
 
 
 def get_clauses(matrix, markers, i, j):
-    cells = util_funcs.get_cells(matrix, markers, i, j)  # chưa xử lý số 0
+    cells = util_funcs.get_cells(matrix, markers, i, j)
 
     if matrix[i][j] == 0:
         return [[-item] for item in cells]
 
     len_cells = len(cells)
     combination_list = generate_combination(cells, len_cells, matrix[i][j])
-    right_position_list = generate_combination(cells, len_cells, len_cells - matrix[i][j] + 1)
+    right_position_list = generate_combination(
+        cells, len_cells, len_cells - matrix[i][j] + 1
+    )
 
     clauses = []
     for sub_list in right_position_list:
@@ -90,8 +92,8 @@ def solve(matrix):
 #     for clause in clauses:
 #         g.add_clause([number for number in clause])
 
-#     print("Number of clauses:", len(clauses))
-#     print("Status:", g.solve())
+#     print('Number of clauses:', len(clauses))
+#     print('Status:', g.solve())
 
 #     model = g.get_model()
 #     if model != None:

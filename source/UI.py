@@ -1,7 +1,9 @@
 import tkinter as tk
-from tkinter.constants import DISABLED, LEFT, NORMAL, RIGHT, X
+from tkinter.constants import DISABLED, LEFT, NORMAL, RIGHT, X, END
 from tkinter.filedialog import askopenfilename
-
+from utilities.file_io import *
+import pysat_solution
+import time
 def GUI():
     root = tk.Tk()
     root.title("Coloring Puzzle - AI HCMUS")
@@ -13,11 +15,13 @@ def GUI():
     bot.pack()
 
     # variables
-    algoMode = ["PySat", "Brute Force", "A Star", "None"]
+    algoMode = ["PySat", "Brute Force", "Backtracking", "A Star", "None"]
     curMode = -1
+    matrix = []
 
     def handleGetFile():
         path = askopenfilename()
+        filePath.delete(0, END)
         filePath.insert(0, path)
         return
 
@@ -36,6 +40,7 @@ def GUI():
         return
 
     def handleDisplayArray():
+        nonlocal matrix
         path = filePath.get()
         if (len(path) == 0):
             warning.config(text="Please choose file or enter file path first!!!!", fg="red")
@@ -47,36 +52,32 @@ def GUI():
             widget.destroy()
 
         try:
-            f = open(path, "r")
+            matrix = read_file(path)
+            size = (len(matrix), len(matrix[0]))
         except FileNotFoundError:
             warning.config(text="File does not exist!!!!", fg="red")
             return
-
-        temp = f.readline().rstrip("\n")
-
-        size = temp.split(" ")
-
-        ls = []
-
-        for i in range(int(size[0])):
-            ls.append(f.readline().rstrip("\n").split(" "))
+        except ValueError:
+            warning.config(text="File does not exist!!!!", fg="red")
+            return
 
         width = root.winfo_width()
         height = root.winfo_height()
         hSum = 0
         wSum = 0
-        for i in range(int(size[0])):
+        for i in range(size[0]):
             h = 0
             w = 0
-            for j in range(int(size[1])):
+            for j in range(size[1]):
                 cell = " "
-                if ls[i][j] != "-1":
-                    cell = ls[i][j]
-                box = tk.Button(array, text=cell, width=9, height=4)
+                if matrix[i][j] != -1:
+                    cell = str(matrix[i][j])
+                # box = tk.Button(array, text=cell, width=9, height=4)
+                box = tk.Label(array, text=cell, width=5, height=2, borderwidth=2, relief='solid', font=("Arial", 20))
                 box.grid(row=i, column=j)
                 box.update()
-                box["state"] = DISABLED
-                box.config(disabledforeground="black")
+                # box["state"] = DISABLED
+                # box.config(disabledforeground="black")
                 h = box.winfo_height()
                 w += box.winfo_width()
             hSum += h
@@ -88,7 +89,6 @@ def GUI():
 
         root.geometry("%dx%d+%d+%d" % (width, height, root.winfo_screenwidth() / 2 - width / 2, root.winfo_screenheight() / 2 - (height + 10) / 2))
 
-        f.close()
         warning.config(text="Load successfully", fg="green")
         okButton["state"] = NORMAL
         return
@@ -105,7 +105,8 @@ def GUI():
         values = (('None', '-1'),
                   ('PySat', '0'),
                   ('Brute Force', '1'),
-                  ('A Star', '2'))
+                  ('Backtracking', '2'),
+                  ('A Star', '3'))
         def onClick():
             return
         def handleConfirm():
@@ -117,16 +118,25 @@ def GUI():
         for item in values:
             tk.Radiobutton(optionWrapper, text=item[0], variable=mode, value=item[1], command=onClick).grid(row=0, column=i)
             i += 1
-        confirmButton = tk.Button(popup, text="Confirm", command=handleConfirm, background="green", fg="white")
+        # confirmButton = tk.Button(popup, text="Confirm", command=handleConfirm, background="green", fg="white")
+        confirmButton = tk.Button(popup, text="Confirm", command=handleConfirm)
         confirmButton.pack(side=RIGHT, padx=10)
-        popup.geometry("300x150+%d+%d" % (root.winfo_screenwidth() / 2 - 150, root.winfo_screenheight() / 2 - 75))
+        popup.geometry("450x150+%d+%d" % (root.winfo_screenwidth() / 2 - 225, root.winfo_screenheight() / 2 - 75))
         return
 
     def handleRunAlgo():
         if (curMode == -1):
             warning.config(text="Please select an algorithm!!!", fg="red")
         else:
-            warning.config(text="Run {}".format(algoMode[curMode]), fg="green")
+            warning.config(text="Running {} ...".format(algoMode[curMode]), fg="blue")
+            if curMode == 0:
+                result = pysat_solution.solve(matrix)
+                for widget, status in zip(array.winfo_children(), result):
+                    color = 'green' if status > 0 else 'red'
+                    widget.config(bg=color, fg='white')
+
+            warning.config(text="Run {} successfully".format(algoMode[curMode]), fg="green")
+
         return
 
     topLeft = tk.Frame(top, width=200, height=100)
@@ -140,7 +150,8 @@ def GUI():
     okButton = tk.Button(topRight, text="Load Puzzle", fg="black", command=handleDisplayArray, width=13)
     okButton.pack(pady=5)
 
-    runButton = tk.Button(topRight, text="Run", bg="green", fg="white", command=handleRunAlgo, width=13)
+    # runButton = tk.Button(topRight, text="Run", bg="green", fg="white", command=handleRunAlgo, width=13)
+    runButton = tk.Button(topRight, text="Run", command=handleRunAlgo, width=13)
     runButton.pack(pady=5)
 
     credit = tk.Button(topRight, text="Credit", fg="black", command=handleCredit, width=13)

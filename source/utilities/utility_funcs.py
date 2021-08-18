@@ -24,3 +24,9 @@ def get_cells(matrix, markers, i, j):
                 cells.append(cell)
 
     return cells
+
+
+def remove_duplicate_clauses(clauses):
+    clauses_sorted = [list(set(clause)) for clause in clauses]
+    clauses_distinct = list(set([''.join(str(clause)) for clause in clauses_sorted]))
+    return [list(map(int, clause.lstrip('[').rstrip(']').split(', '))) for clause in clauses_distinct]

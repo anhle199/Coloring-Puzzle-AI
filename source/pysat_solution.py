@@ -65,6 +65,8 @@ def solve():
         for j in range(len(matrix[i])):
             if matrix[i][j] > 0:
                 clauses += get_clauses(matrix, markers, i, j)
+
+    clauses = util_funcs.remove_duplicate_clauses(clauses)
     for clause in clauses:
         g.add_clause([number for number in clause])
 

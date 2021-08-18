@@ -20,7 +20,7 @@ def GUI():
         path = askopenfilename()
         filePath.insert(0, path)
         return
-    
+
     def handleCredit():
         popup = tk.Tk()
         popup.title("Credit")
@@ -40,7 +40,7 @@ def GUI():
         if (len(path) == 0):
             warning.config(text="Please choose file or enter file path first!!!!", fg="red")
             return
-        
+
         warning.config(text="Loading puzzle .....", fg="blue")
         okButton["state"] = DISABLED
         for widget in array.winfo_children():
@@ -51,7 +51,7 @@ def GUI():
         except FileNotFoundError:
             warning.config(text="File does not exist!!!!", fg="red")
             return
-        
+
         temp = f.readline().rstrip("\n")
 
         size = temp.split(" ")
@@ -60,7 +60,7 @@ def GUI():
 
         for i in range(int(size[0])):
             ls.append(f.readline().rstrip("\n").split(" "))
-        
+
         width = root.winfo_width()
         height = root.winfo_height()
         hSum = 0
@@ -85,14 +85,14 @@ def GUI():
             width += wSum - width + 20
         if hSum > height - 100:
             height += hSum - height + root.winfo_height() + 20
-        
+
         root.geometry("%dx%d+%d+%d" % (width, height, root.winfo_screenwidth() / 2 - width / 2, root.winfo_screenheight() / 2 - (height + 10) / 2))
-        
+
         f.close()
         warning.config(text="Load successfully", fg="green")
         okButton["state"] = NORMAL
         return
-    
+
     def handleSelectAlgo():
         popup = tk.Tk()
         nonlocal curMode
@@ -109,7 +109,7 @@ def GUI():
         def onClick():
             return
         def handleConfirm():
-            nonlocal curMode 
+            nonlocal curMode
             curMode = int(mode.get())
             algoTitle.config(text="Selected Algorithm: {}".format(algoMode[curMode]))
             popup.destroy()
@@ -128,7 +128,7 @@ def GUI():
         else:
             warning.config(text="Run {}".format(algoMode[curMode]), fg="green")
         return
-    
+
     topLeft = tk.Frame(top, width=200, height=100)
     topLeft.pack(side=LEFT, padx=10)
     topRight = tk.Frame(top, width=200, height=100)

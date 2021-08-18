@@ -44,20 +44,20 @@ def get_clauses(matrix, markers, i, j):
     return clauses
 
 
-def solve():
+def solve(matrix):
     g = Glucose3()
-    matrix = [
-        [-1,  2,  3, -1, -1,  0, -1, -1, -1, -1],
-        [-1, -1, -1, -1,  3, -1,  2, -1, -1,  6],
-        [-1, -1,  5, -1,  5,  3, -1,  5,  7,  4],
-        [-1,  4, -1,  5, -1,  5, -1,  6, -1,  3],
-        [-1, -1,  4, -1,  5, -1,  6, -1, -1,  3],
-        [-1, -1, -1,  2, -1,  5, -1, -1, -1, -1],
-        [ 4, -1,  1, -1, -1, -1,  1,  1, -1, -1],
-        [ 4, -1,  1, -1, -1, -1,  1, -1,  4, -1],
-        [-1, -1, -1, -1,  6, -1, -1, -1, -1,  4],
-        [-1,  4,  4, -1, -1, -1, -1,  4, -1, -1],
-    ]
+    # matrix = [
+    #     [-1,  2,  3, -1, -1,  0, -1, -1, -1, -1],
+    #     [-1, -1, -1, -1,  3, -1,  2, -1, -1,  6],
+    #     [-1, -1,  5, -1,  5,  3, -1,  5,  7,  4],
+    #     [-1,  4, -1,  5, -1,  5, -1,  6, -1,  3],
+    #     [-1, -1,  4, -1,  5, -1,  6, -1, -1,  3],
+    #     [-1, -1, -1,  2, -1,  5, -1, -1, -1, -1],
+    #     [ 4, -1,  1, -1, -1, -1,  1,  1, -1, -1],
+    #     [ 4, -1,  1, -1, -1, -1,  1, -1,  4, -1],
+    #     [-1, -1, -1, -1,  6, -1, -1, -1, -1,  4],
+    #     [-1,  4,  4, -1, -1, -1, -1,  4, -1, -1],
+    # ]
     markers = mark_all_zero(matrix)
 
     clauses = []
@@ -70,12 +70,23 @@ def solve():
     for clause in clauses:
         g.add_clause([number for number in clause])
 
-    print("Number of clauses:", len(clauses))
-    print("Status:", g.solve())
-
+    # print("Number of clauses:", len(clauses))
+    # print("Status:", g.solve())
+    g.solve()
     model = g.get_model()
-    if model != None:
-        for i in range(0, len(model), 10):
-            for j in range(10):
-                print('*' if model[i + j] > 0 else '_', end=' ')
-            print('')
+    return model
+    # result = None
+    # if model != None:
+    #     result = []
+    #     for i in range(0, len(model), len(matrix[0])):
+    #         result.append([])
+    #         for j in range(len(matrix[0])):
+    #             result[-1].append(True if model[i + j] > 0 else False)
+    # return result
+            #     print('*' if model[i + j] > 0 else '_', end=' ')
+            # print('')
+        # for i in range(0, len(model), 10):
+        #     for j in range(10):
+        #         print('*' if model[i + j] > 0 else '_', end=' ')
+        #     print('')
+

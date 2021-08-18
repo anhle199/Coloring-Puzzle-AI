@@ -10,6 +10,7 @@ def read_file(file_path):
         # read and assign data in matrix (board)
         board = [reader.readline().rstrip('\n').split() for _ in range(num_rows)]
         matrix = [[int(cell) for cell in row] for row in board]
+        reader.close()
     except FileNotFoundError:
         raise ValueError('File does not exist!!!')
     except ValueError:
@@ -26,5 +27,6 @@ def write_file(file_path, matrix):
         num_cols = len(matrix[0])
         writer.write(str(num_rows) + ' ' + str(num_cols))
         writer.writelines(['\n' + ' '.join(row) for row in matrix])
+        writer.close()
     except:
         raise ValueError('Can not write data to file!!!')

@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter.constants import BOTH, BOTTOM, DISABLED, LEFT, NORMAL, RIGHT, X, END, Y
+from tkinter.constants import BOTH, BOTTOM, DISABLED, LEFT, NORMAL, RIGHT, TOP, W, X, END, Y
 from tkinter.filedialog import askopenfilename
 from utilities.file_io import *
 from utilities.constants import CellStatus, CellSize, Algorithm, ScrollConst
@@ -13,11 +13,9 @@ def GUI():
     root.title('Coloring Puzzle - AI HCMUS')
 
     # General Frame
-    top = tk.Frame(root)
+    top = tk.LabelFrame(root, text="Command")
     top.pack(pady=10)
-    mid = tk.Frame(root)
-    mid.pack(fill=X, padx=10, pady=5)
-    bot = tk.Frame(root, borderwidth=1, relief='solid')
+    bot = tk.LabelFrame(root, text="Puzzle")
     bot.pack(fill=BOTH, expand=True, padx=10, pady=10)
     foot = tk.Frame(bot)
     foot.pack(fill=X, side=BOTTOM)
@@ -29,10 +27,12 @@ def GUI():
     curMode = -1
     matrix = []
 
+    # Function in GUI
     def handleGetFile(): # Get file's path
         path = askopenfilename()
-        filePath.delete(0, END)
-        filePath.insert(0, path)
+        if (len(path) != 0):
+            filePath.delete(0, END)
+            filePath.insert(0, path)
         return
 
     def handleCredit(): # Show credit information
@@ -69,7 +69,7 @@ def GUI():
             okButton['state'] = NORMAL
             return
         except ValueError:
-            warning.config(text='Error in input file format!!!!', fg='red')
+            warning.config(text='Incorrect file format!!!!', fg='red')
             okButton['state'] = NORMAL
             return
 
@@ -111,7 +111,7 @@ def GUI():
         def handleConfirm():
             nonlocal curMode
             curMode = int(mode.get())
-            algoTitle.config(text='Selected Algorithm: {}'.format(algoMode[curMode]))
+            algoSelected.config(text='{}'.format(algoMode[curMode]))
             popup.destroy()
         for i, item in zip(range(len(values)), values):
             tk.Radiobutton(optionWrapper, text=item[0], variable=mode, value=item[1], command=onClick).grid(row=0, column=i)
@@ -120,7 +120,7 @@ def GUI():
         popup.geometry('450x150+%d+%d' % (root.winfo_screenwidth() / 2 - 225, root.winfo_screenheight() / 2 - 75))
         return
 
-    def handleRunAlgo():
+    def handleRunAlgo(): # Run algorithm to solve the puzzle
         if (curMode == -1):
             warning.config(text='Please select an algorithm!!!', fg='red')
         else:
@@ -152,12 +152,23 @@ def GUI():
                     warning.config(text='Run {} successfully'.format(algoMode[curMode]), fg='green')
 
         return
+    
+    def handleClear(): # Clear puzzle
+        warning.config(text='Clearing puzzle .....', fg='blue')
+        nonlocal matrix
+        for widget in array.winfo_children():
+            widget.destroy()
+        matrix.clear()
+        warning.config(text='Clear puzzle successfully', fg='green')
+        return
 
+    # Command frame
     topLeft = tk.Frame(top, width=200, height=100)
     topLeft.pack(side=LEFT, padx=10)
     topRight = tk.Frame(top, width=200, height=100)
     topRight.pack(side=RIGHT, padx=10)
 
+    # Command button (TOP RIGHT)
     chooseFile = tk.Button(topRight, text='Choose File', fg='black', command=handleGetFile, width=13)
     chooseFile.pack(pady=5)
 
@@ -167,14 +178,11 @@ def GUI():
     runButton = tk.Button(topRight, text='Run', command=handleRunAlgo, width=13)
     runButton.pack(pady=5)
 
+    clearButton = tk.Button(topRight, text='Clear Puzzle', fg='black', command=handleClear, width=13)
+    clearButton.pack(pady=5)
+
     credit = tk.Button(topRight, text='Credit', fg='black', command=handleCredit, width=13)
     credit.pack(pady=5)
-
-    # Notification while running
-    status = tk.Label(mid, text='Notification:')
-    status.pack(side=LEFT)
-    warning = tk.Label(mid, text='None', fg='black')
-    warning.pack(side=LEFT)
 
     # Area for display data
     canvas = tk.Canvas(bot)
@@ -199,14 +207,24 @@ def GUI():
     canvas.create_window((0, 0), window=array, anchor="nw")
 
     # Command Infomation (TOP LEFT)
-    pathTitle = tk.Label(topLeft, text='Path', justify=LEFT)
+    pathTitle = tk.Label(topLeft, text='Path:')
     filePath = tk.Entry(topLeft, width=50)
-    pathTitle.pack()
+    pathTitle.pack(anchor=W)
     filePath.pack()
-    algoTitle = tk.Label(topLeft, text='Selected Algorithm: {}'.format(algoMode[curMode]))
+    algoBlock = tk.Frame(topLeft)
+    algoBlock.pack(fill=X)
+    algoTitle = tk.Label(algoBlock, text='Selected Algorithm:')
     algoTitle.pack(side=LEFT)
-    algoButton = tk.Button(topLeft, text='Select Algorithm', fg='black', command=handleSelectAlgo, width=13)
+    algoSelected = tk.Label(algoBlock, text='{}'.format(algoMode[curMode]), fg='blue')
+    algoSelected.pack(side=LEFT)
+    algoButton = tk.Button(algoBlock, text='Select Algorithm', fg='black', command=handleSelectAlgo, width=13)
     algoButton.pack(side=RIGHT, pady=10)
+
+    # Notification while running
+    mid = tk.LabelFrame(topLeft, text="Status")
+    mid.pack(side=BOTTOM, fill=X)
+    warning = tk.Label(mid, text='None', fg='black')
+    warning.pack(padx=5, pady=5)
 
     # main window size
     width = 1000 if root.winfo_screenwidth() > 1000 else root.winfo_screenwidth()

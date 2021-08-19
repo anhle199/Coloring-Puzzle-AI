@@ -1,15 +1,27 @@
 import copy
 from pysat.solvers import Glucose3
 from utilities.combination_algos import generate_combination
-from utilities.util_funcs import get_cells, negate, create_markers, remove_duplicate_clauses
+from utilities.util_funcs import calc_no, get_cells, negate, create_markers, remove_duplicate_clauses
+
+
+def get_clauses_for_zero(matrix, markers, i, j):
+    num_rows = len(matrix)
+    row_start = i - 1 if i > 0 else i
+    row_end = i + 1 if i < num_rows - 1 else i
+    col_start = j - 1 if j > 0 else j
+    col_end = j + 1 if j < len(matrix[0]) - 1 else j
+
+    clauses = []
+    for row in range(row_start, row_end + 1):
+        for col in range(col_start, col_end + 1):
+            cell = calc_no(row, col, num_rows)
+            clauses.append([-cell])
+
+    return clauses
 
 
 def get_clauses(matrix, markers, i, j):
     cells, len_cells = get_cells(matrix, markers, i, j)
-
-    if matrix[i][j] == 0:
-        return [[-item] for item in cells]
-
     combination_list = generate_combination(cells, len_cells, matrix[i][j])
     right_position_list = generate_combination(cells, len_cells, len_cells - matrix[i][j] + 1)
 
@@ -31,6 +43,8 @@ def generate_cnf_clauses(matrix):
         for j in range(len(matrix[i])):
             if matrix[i][j] > 0:
                 clauses += get_clauses(matrix, markers, i, j)
+            elif matrix[i][j] == 0:
+                clauses += get_clauses_for_zero(matrix, markers, i, j)
 
     return remove_duplicate_clauses(clauses)
 
@@ -38,6 +52,7 @@ def generate_cnf_clauses(matrix):
 def solve(matrix):
     clauses = generate_cnf_clauses(matrix)
     g = Glucose3()
+    print('')
     for clause in clauses:
         g.add_clause([number for number in clause])
 

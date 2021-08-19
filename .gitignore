@@ -1,4 +1,4 @@
 .vscode
 *.DS_Store
-*test.py
+*test*.py
 *__pycache__

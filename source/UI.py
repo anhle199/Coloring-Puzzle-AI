@@ -2,8 +2,10 @@ import tkinter as tk
 from tkinter.constants import DISABLED, LEFT, NORMAL, RIGHT, X, END
 from tkinter.filedialog import askopenfilename
 from utilities.file_io import *
+from utilities.constants import CellStatus, CellSize, Algorithm
 import pysat_solution
-from utilities import constants
+import backtracking
+
 
 def GUI():
     root = tk.Tk()
@@ -16,7 +18,7 @@ def GUI():
     bot.pack()
 
     # variables
-    algoMode = ['PySat', 'Brute Force', 'Backtracking', 'A Star', 'None']
+    algoMode = ['PySat', 'A Star', 'Brute Force', 'Backtracking', 'None']
     curMode = -1
     matrix = []
 
@@ -73,7 +75,7 @@ def GUI():
                 cell = ' '
                 if matrix[i][j] != -1:
                     cell = str(matrix[i][j])
-                box = tk.Label(array, text=cell, width=constants.cell_width, height=constants.cell_height, borderwidth=2, relief='solid', font=('Arial', 20))
+                box = tk.Label(array, text=cell, width=CellSize.WIDTH, height=CellSize.HEIGHT, borderwidth=2, relief='solid', font=('Arial', 20))
                 box.grid(row=i, column=j)
                 box.update()
                 h = box.winfo_height()
@@ -100,11 +102,17 @@ def GUI():
         titleText.pack(padx=10, pady=10)
         optionWrapper = tk.LabelFrame(popup)
         optionWrapper.pack()
-        values = (('None', '-1'),
-                  ('PySat', '0'),
-                  ('Brute Force', '1'),
-                  ('Backtracking', '2'),
-                  ('A Star', '3'))
+        values = (
+            ('None', '-1'),
+            ('PySat', '0'),
+            ('A Star', '1'),
+            ('Brute Force', '2'),
+            ('Backtracking', '3')
+            # ('PySat', str(Algorithm.PYSAT)),
+            # ('A Star', str(Algorithm.A_STAR)),
+            # ('Brute Force', str(Algorithm.BRUTE_FORCE)),
+            # ('Backtracking', str(Algorithm.BACKTRACKING))
+        )
         def onClick():
             return
         def handleConfirm():
@@ -127,13 +135,24 @@ def GUI():
             warning.config(text='Please select an algorithm!!!', fg='red')
         else:
             warning.config(text='Running {} ...'.format(algoMode[curMode]), fg='blue')
-            if curMode == 0:
-                result = pysat_solution.solve(matrix)
-                for widget, status in zip(array.winfo_children(), result):
-                    color = 'green' if status > 0 else 'red'
-                    widget.config(bg=color, fg='white')
 
-            warning.config(text='Run {} successfully'.format(algoMode[curMode]), fg='green')
+            model = None
+            if curMode == Algorithm.PYSAT:
+                model = pysat_solution.solve(matrix)
+            elif curMode == Algorithm.A_STAR:
+                warning.config(text='Not implemented {} yet'.format(algoMode[curMode]), fg='red')
+            elif curMode == Algorithm.BRUTE_FORCE:
+                warning.config(text='Not implemented {} yet'.format(algoMode[curMode]), fg='red')
+            elif curMode == Algorithm.BACKTRACKING:
+                model = backtracking.solve(matrix)
+
+            if model == None:
+                warning.config(text='No solution with {}'.format(algoMode[curMode]), fg='green')
+            else:
+                for widget, num in zip(array.winfo_children(), model):
+                    color = 'green' if num > 0 else 'red'
+                    widget.config(bg=color, fg='white')
+                warning.config(text='Run {} successfully'.format(algoMode[curMode]), fg='green')
 
         return
 

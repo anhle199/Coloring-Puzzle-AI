@@ -5,6 +5,7 @@ from utilities.file_io import *
 from utilities.constants import CellStatus, CellSize, Algorithm, ScrollConst
 import pysat_solution
 import backtracking
+import brute_force
 
 
 def GUI():
@@ -136,7 +137,8 @@ def GUI():
             elif curMode == Algorithm.A_STAR:
                 warning.config(text='{} has not been implemented yet'.format(algoMode[curMode]), fg='red')
             elif curMode == Algorithm.BRUTE_FORCE:
-                warning.config(text='{} has not been implemented yet'.format(algoMode[curMode]), fg='red')
+                model = brute_force.solve(matrix)
+                run = True
             elif curMode == Algorithm.BACKTRACKING:
                 model = backtracking.solve(matrix)
                 run = True

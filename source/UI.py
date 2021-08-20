@@ -3,7 +3,7 @@ from tkinter.constants import BOTH, BOTTOM, DISABLED, LEFT, NORMAL, RIGHT, TOP, 
 from tkinter.filedialog import askopenfilename
 from utilities.file_io import *
 from utilities.constants import CellStatus, CellSize, Algorithm, ScrollConst
-from utilities.util_funcs import create_markers, calc_next_indices, cell_to_indices
+from utilities.util_funcs import create_markers, calc_next_indices, cell_to_indices, get_cells
 from utilities.combination_algos import generate_combination
 import pysat_solution
 from backtracking import backtracking
@@ -173,7 +173,7 @@ def GUI():
                     set_cells(sub_list['extracted'], markers, CellStatus.MARKED)#
                     set_cells(sub_list['remaining'], markers, CellStatus.BANNED)#
 
-                    next_i, next_j = w(num_rows, num_cols, i, j)
+                    next_i, next_j = calc_next_indices(num_rows, num_cols, i, j)
                     status = backtracking(matrix, markers, num_rows, num_cols, next_i, next_j)
                     if status:
                         return status

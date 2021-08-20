@@ -44,20 +44,6 @@ def GUI():
             filePath.insert(0, path)
         return
 
-    # def handleCredit(): # Show credit information
-    #     popup = tk.Tk()
-    #     popup.title('Credit')
-    #     creditText = tk.Label(popup, text='Project 2: Coloring Puzzle', font=('Arial', 15))
-    #     creditText.pack(padx=10, pady=10)
-    #     creditTextBody1 = tk.Label(popup, text='Programmed by:', font=('Arial', 10))
-    #     creditTextBody1.pack()
-    #     creditTextBody2 = tk.Label(popup, text='Nguyen Hua Hung - 19127150\nLe Minh Huy - 19127157\nLe Hoang Anh - 19127329')
-    #     creditTextBody2.pack(padx=10, pady=5)
-    #     creditTextFooter = tk.Label(popup, text='University Of Science - HCM City', font=('Arial', 10))
-    #     creditTextFooter.pack(padx=10, pady=10)
-    #     popup.geometry('300x200+%d+%d' % (root.winfo_screenwidth() / 2 - 150, root.winfo_screenheight() / 2 - 100))
-    #     return
-
     def handleDisplayArray():  # Load puzzle array
         nonlocal matrix
         path = filePath.get()
@@ -117,7 +103,7 @@ def GUI():
             ("None", "-1"),
             ("PySat", "0"),
             ("A Star", "1"),
-            ("BruteForce", "2"),
+            ("Brute Force", "2"),
             ("Backtracking", "3")
             # ('None', Algorithm.PYSAT),
             # ('PySat', Algorithm.PYSAT),
@@ -149,6 +135,11 @@ def GUI():
             "450x150+%d+%d"
             % (root.winfo_screenwidth() / 2 - 225, root.winfo_screenheight() / 2 - 75)
         )
+        return
+
+    def renew():
+        for widget in array.winfo_children():
+            widget.config(bg='white', fg="black")
         return
 
     def redraw(markers):
@@ -237,8 +228,15 @@ def GUI():
                 if markers[i][j] == CellStatus.MARKED:
                     model[(num_rows * i) + j] = -model[(num_rows * i) + j]
 
+        try:
+            path = filePath.get().split('/')
+            path[-1] = 'backtracking_output.txt'
+            write_file('/' + '/'.join(path), model, len(matrix), len(matrix[0]))
+        except ValueError:
+            print('Can not write data to file!!!')
+
         warning.config(text="Run {} successfully".format(algoMode[curMode]), fg="green")
-        return model
+        return
     ########################################################################################
 
 
@@ -300,9 +298,15 @@ def GUI():
             for j in range(num_cols):
                 if markers[i][j] == CellStatus.MARKED:
                     model[(num_rows * i) + j] = -model[(num_rows * i) + j]
+        try:
+            path = filePath.get().split('/')
+            path[-1] = 'brute_force_output.txt'
+            write_file('/' + '/'.join(path), model, len(matrix), len(matrix[0]))
+        except ValueError:
+            print('Can not write data to file!!!')
 
         warning.config(text="Run {} successfully".format(algoMode[curMode]), fg="green")
-        return model
+        return
     ########################################################################################
 
 
@@ -310,62 +314,47 @@ def GUI():
     def handleRunAlgo():  # Run algorithm to solve the puzzle
         nonlocal stopFlag
         stopFlag = False
+        renew()
         if curMode == -1:
             warning.config(text="Please select an algorithm!!!", fg="red")
         else:
-            changeAllButtonState(DISABLED)
             if len(matrix) == 0:
                 warning.config(text="Please load the puzzle first!!!", fg="red")
                 return
-
+            changeAllButtonState(DISABLED)
             warning.config(text="Running {} .....".format(algoMode[curMode]), fg="blue")
 
             model = None
-            run = False
 
             if curMode == Algorithm.PYSAT:
-# <<<<<<< hung
-#                 model = pysat_solution.solve(matrix)
-#                 changeAllButtonState(NORMAL)
-#                 run = True
-#             elif curMode == Algorithm.A_STAR:
-#                 warning.config(text='{} has not been implemented yet'.format(algoMode[curMode]), fg='red')
-# =======
-#                 model = pysat_algo.solve(matrix)
-#                 changeAllButtonState(NORMAL)
-#                 run = True
-#             elif curMode == Algorithm.A_STAR:
-#                 warning.config(
-#                     text="{} has not been implemented yet".format(algoMode[curMode]),
-#                     fg="red",
-#                 )
-# >>>>>>> master
-#                 changeAllButtonState(NORMAL)
-#             elif curMode == Algorithm.BRUTE_FORCE:
-#                 # model = brute_force.solve(matrix)
-#                 threading.Thread(target=run_brute_force_realtime).start()
-#                 # run = True
-#             elif curMode == Algorithm.BACKTRACKING:
-# <<<<<<< hung
-#                 if (rtFlag):
-#                     threading.Thread(target=run_backtracking).start()
-#                 else:
-#                     model = solve(matrix)
-#                     changeAllButtonState(NORMAL)
-#                     run = True
-# =======
-#                 threading.Thread(target=run_backtracking_realtime).start()
-#                 # run = True
-# >>>>>>> master
-            if run == True:
-                if model == None:
-                    warning.config(
-                        text="No solution with {}".format(algoMode[curMode]), fg="green"
-                    )
+                model = pysat_algo.solve(matrix)
+                changeAllButtonState(NORMAL)
+            elif curMode == Algorithm.A_STAR:
+                warning.config(text="{} has not been implemented yet".format(algoMode[curMode]), fg="red")
+                changeAllButtonState(NORMAL)
+                return
+            elif curMode == Algorithm.BRUTE_FORCE:
+                if (rtFlag):
+                    threading.Thread(target=run_brute_force_realtime).start()
                 else:
-                    # path = filePath.get()
+                    model = brute_force_algo.solve(matrix)
+                    changeAllButtonState(NORMAL)
+            elif curMode == Algorithm.BACKTRACKING:
+                if (rtFlag):
+                    threading.Thread(target=run_backtracking_realtime).start()
+                else:
+                    model = backtracking_algo.solve(matrix)
+                    changeAllButtonState(NORMAL)
+
+            if curMode == Algorithm.PYSAT or not rtFlag:
+                if model == None:
+                    warning.config(text="No solution with {}".format(algoMode[curMode]), fg="green")
+                else:
                     try:
-                        write_file('/Users/lehoanganh/Desktop/HoangAnh/SecondYear/ThirdSemester/Intro2AI/Lab/Project2/Coloring-Puzzle-AI/source/output.txt', model, len(matrix), len(matrix[0]))
+                        algo_names = ['pysat', 'a_star', 'brute_force', 'backtracking']
+                        path = filePath.get().split('/')
+                        path[-1] = algo_names[curMode] + '_output.txt'
+                        write_file('/' + '/'.join(path), model, len(matrix), len(matrix[0]))
                     except ValueError:
                         print('Can not write data to file!!!')
 
@@ -391,7 +380,7 @@ def GUI():
         nonlocal stopFlag
         stopFlag = True
         return
-    
+
     def handleRealtime():
         nonlocal rtFlag
         if rtFlag:
@@ -432,18 +421,8 @@ def GUI():
     )
     stopButton.pack(pady=5)
 
-# <<<<<<< hung
-#     realtimeToggle = tk.Button(topRight, text="Realtime: OFF", fg='black', command=handleRealtime, width=13)
-#     realtimeToggle.pack(pady=5)
-
-#     # credit = tk.Button(topRight, text='Credit', fg='black', command=handleCredit, width=13)
-#     # credit.pack(pady=5)
-# =======
-#     credit = tk.Button(
-#         topRight, text="Credit", fg="black", command=handleCredit, width=13
-#     )
-#     credit.pack(pady=5)
-# >>>>>>> master
+    realtimeToggle = tk.Button(topRight, text="Realtime: OFF", fg='black', command=handleRealtime, width=13)
+    realtimeToggle.pack(pady=5)
 
     # Area for display data
     canvas = tk.Canvas(bot)

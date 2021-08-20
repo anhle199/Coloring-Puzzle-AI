@@ -15,7 +15,7 @@ def model_to_markers(model, num_rows, num_cols):
         markers.append([])
         for j in range(num_cols):
             num = calc_no(i, j, num_rows)
-            markers[-1].append(CellStatus.MARKED if num > 0 else CellStatus.UNMARKED)
+            markers[-1].append('1' if model[num - 1] > 0 else '0')
     return markers
 
 

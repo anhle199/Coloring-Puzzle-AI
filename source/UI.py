@@ -6,8 +6,9 @@ from utilities.constants import CellStatus, CellSize, Algorithm, ScrollConst
 from utilities.util_funcs import create_markers, calc_next_indices, cell_to_indices, get_cells
 from utilities.combination_algos import generate_combination
 import pysat_solution
-from backtracking import backtracking
+from backtracking import backtracking, count_cells_marked
 import brute_force
+import threading
 
 
 def GUI():
@@ -121,6 +122,14 @@ def GUI():
         confirmButton.pack(side=RIGHT, padx=10)
         popup.geometry('450x150+%d+%d' % (root.winfo_screenwidth() / 2 - 225, root.winfo_screenheight() / 2 - 75))
         return
+    
+    def redraw(markers):
+        for widget, i in zip(array.winfo_children(), range(len(array.winfo_children()))):
+            row = int(i / len(markers[0]))
+            col = i - row * len(markers[0])
+            color = 'green' if markers[row][col] == CellStatus.MARKED else 'red'
+            widget.config(bg=color, fg='white')
+        return
 
     ########################################################################
     def set_cells(cells, markers, val):
@@ -156,10 +165,14 @@ def GUI():
                 next_i, next_j = calc_next_indices(num_rows, num_cols, i, j)
                 return backtracking(matrix, markers, num_rows, num_cols, next_i, next_j)
 
+            if count_cells_marked(markers, i, j) > matrix[i][j]:
+                return False
+
             cells, max_cells = get_cells(matrix, markers, i, j)
             k = matrix[i][j] - (max_cells - len(cells))  # number of remaining cells that can color adjacent matrix[i][j] cell.
             if k == 0:
                 set_cells(cells, markers, CellStatus.BANNED)#
+                redraw(markers) #markers BANNED = UNMARKED = đỏ, MARKED = xanh
 
                 next_i, next_j = calc_next_indices(num_rows, num_cols, i, j)
                 status = backtracking(matrix, markers, num_rows, num_cols, next_i, next_j)
@@ -167,11 +180,14 @@ def GUI():
                     return status
 
                 set_cells(cells, markers, CellStatus.UNMARKED)#
+                redraw(markers)
             else:
                 combination_list = generate_combination(cells, len(cells), k)
                 for sub_list in combination_list:
                     set_cells(sub_list['extracted'], markers, CellStatus.MARKED)#
+                    #redraw(markers)
                     set_cells(sub_list['remaining'], markers, CellStatus.BANNED)#
+                    redraw(markers)
 
                     next_i, next_j = calc_next_indices(num_rows, num_cols, i, j)
                     status = backtracking(matrix, markers, num_rows, num_cols, next_i, next_j)
@@ -179,22 +195,28 @@ def GUI():
                         return status
 
                     set_cells(sub_list['extracted'] + sub_list['remaining'], markers, CellStatus.UNMARKED)#
+                    redraw(markers)
 
             return False
 
         num_rows, num_cols = len(matrix), len(matrix[0])
         markers = create_markers(matrix) #
+        #threading.Thread(target=redraw, args=(markers)).start()
+        redraw(markers)
         status = backtracking(matrix, markers, num_rows, num_cols, 0, 0)
         if not status:
             return None
+        #threading.Thread(target=redraw, args=(markers)).start()
+        redraw(markers)
 
-        model = [-num for num in range(1, num_rows * num_cols + 1)]
-        for i in range(num_rows):
-            for j in range(num_cols):
-                if markers[i][j] == CellStatus.MARKED:
-                    model[(num_rows * i) + j] = -model[(num_rows * i) + j]
+        # model = [-num for num in range(1, num_rows * num_cols + 1)]
+        # for i in range(num_rows):
+        #     for j in range(num_cols):
+        #         if markers[i][j] == CellStatus.MARKED:
+        #             model[(num_rows * i) + j] = -model[(num_rows * i) + j]
 
-        return model
+        warning.config(text='Run {} successfully'.format(algoMode[curMode]), fg='green')
+        return# model
     ################################################################################
 
     def handleRunAlgo(): # Run algorithm to solve the puzzle
@@ -217,8 +239,8 @@ def GUI():
                 model = brute_force.solve(matrix)
                 run = True
             elif curMode == Algorithm.BACKTRACKING:
-                model = run_backtracking()
-                run = True
+                threading.Thread(target=run_backtracking).start()
+                #run = True
             if run == True:
                 if model == None:
                     warning.config(text='No solution with {}'.format(algoMode[curMode]), fg='green')

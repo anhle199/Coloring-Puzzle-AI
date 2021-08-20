@@ -53,9 +53,8 @@ def generate_cnf_clauses(matrix):
 def solve(matrix):
     clauses = generate_cnf_clauses(matrix)
     g = Glucose3()
-    print('')
     for clause in clauses:
         g.add_clause([number for number in clause])
-
+    print()
     status = g.solve()
     return g.get_model() if status else None

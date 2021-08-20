@@ -44,11 +44,16 @@ def get_cells(matrix, markers, i, j):
     count = 0
     for row in range(row_start, row_end + 1):
         for col in range(col_start, col_end + 1):
-            if markers[row][col] != CellStatus.BANNED:
+            if markers[row][col] == CellStatus.UNMARKED:
+                cell = calc_no(row, col, num_rows)
+                cells.append(cell)
+            elif markers[row][col] == CellStatus.MARKED:
                 count += 1
-                if markers[row][col] == CellStatus.UNMARKED:
-                    cell = calc_no(row, col, num_rows)
-                    cells.append(cell)
+            # if markers[row][col] != CellStatus.BANNED:
+            #     count += 1
+            #     if markers[row][col] == CellStatus.UNMARKED:
+            #         cell = calc_no(row, col, num_rows)
+            #         cells.append(cell)
 
     return cells, count
 

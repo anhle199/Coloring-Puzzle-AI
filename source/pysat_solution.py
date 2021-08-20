@@ -21,7 +21,8 @@ def get_clauses_for_zero(matrix, markers, i, j):
 
 
 def get_clauses(matrix, markers, i, j):
-    cells, len_cells = get_cells(matrix, markers, i, j)
+    cells, num_cells_marked = get_cells(matrix, markers, i, j)
+    len_cells = len(cells)
     combination_list = generate_combination(cells, len_cells, matrix[i][j])
     right_position_list = generate_combination(cells, len_cells, len_cells - matrix[i][j] + 1)
 

@@ -2,8 +2,8 @@ import tkinter as tk
 from tkinter.constants import BOTH, BOTTOM, DISABLED, LEFT, NORMAL, RIGHT, TOP, W, X, END, Y
 from tkinter.filedialog import askopenfilename
 from utilities.file_io import *
-from utilities.constants import CellStatus, CellSize, Algorithm, ScrollConst
-from utilities.util_funcs import create_markers, calc_next_indices, cell_to_indices, get_cells, set_cells, count_cells_marked, validate
+from utilities.constants import CellStatus, CellSize, Algorithm, ScrollConst, FilePath
+from utilities.util_funcs import create_markers, calc_next_indices, get_cells, set_cells, count_cells_marked, validate
 from utilities.combination_algos import generate_combination
 import pysat_algo
 import backtracking_algo
@@ -218,7 +218,7 @@ def GUI():
             path = filePath.get().split('/')
             path[-1] = 'backtracking_output.txt'
             msg = 'Output file: ' + path[-1]
-            write_file('/' + '/'.join(path), model, len(matrix), len(matrix[0]))
+            write_file(FilePath.SLASH + '/'.join(path), model, len(matrix), len(matrix[0]))
         except ValueError:
             msg = 'Can not write data to file!!!'
 
@@ -289,7 +289,7 @@ def GUI():
             path = filePath.get().split('/')
             path[-1] = 'brute_force_output.txt'
             msg = 'Output file: ' + path[-1]
-            write_file('/' + '/'.join(path), model, len(matrix), len(matrix[0]))
+            write_file(FilePath.SLASH + '/'.join(path), model, len(matrix), len(matrix[0]))
         except ValueError:
             msg = 'Can not write data to file!!!'
 
@@ -343,9 +343,9 @@ def GUI():
                         path = filePath.get().split('/')
                         path[-1] = algo_names[curMode] + '_output.txt'
                         msg = 'Output file: ' + path[-1]
-                        write_file('/' + '/'.join(path), model, len(matrix), len(matrix[0]))
+                        write_file(FilePath.SLASH + '/'.join(path), model, len(matrix), len(matrix[0]))
                     except ValueError:
-                        msg = 'Can not write data to file!!!'
+                        msg = 'Cannot write data to file!!!'
 
                     for widget, num in zip(array.winfo_children(), model):
                         color = "green" if num > 0 else "red"

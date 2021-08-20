@@ -8,7 +8,7 @@ class CellStatus:
 class CellSize:
     WIDTH = 9
     HEIGHT = 4
-    FONTSIZE = 10
+    FONTSIZE = 12
     if platform.system() == 'Darwin':
         WIDTH = 5
         HEIGHT = 2
@@ -25,3 +25,8 @@ class ScrollConst:
     MODIFIER = 120
     if platform.system() == 'Darwin':
         MODIFIER = 1
+
+class FilePath:
+    SLASH = ''
+    if platform.system() == 'Darwin':
+        SLASH = '/'

@@ -29,6 +29,7 @@ def GUI():
     algoMode = ['PySat', 'A Star', 'BruteForce', 'Backtracking', 'None']
     curMode = -1
     matrix = []
+    stopFlag = False
 
     # Function in GUI
     def handleGetFile(): # Get file's path
@@ -131,6 +132,14 @@ def GUI():
             widget.config(bg=color, fg='white')
         return
 
+    def changeAllButtonState(state):
+        chooseFile['state'] = state
+        okButton['state'] = state
+        runButton['state'] = state
+        clearButton['state'] = state
+        algoButton['state'] = state
+        return
+
     ########################################################################
     def set_cells(cells, markers, val):
         num_rows, num_cols = len(markers), len(markers[0])
@@ -139,6 +148,7 @@ def GUI():
             markers[row][col] = val
 
     def run_backtracking():
+        nonlocal stopFlag
         def create_markers(matrix):
             markers = [[CellStatus.UNMARKED for _ in range(len(matrix[0]))] for _ in range(len(matrix))]
             for i in range(len(matrix)):
@@ -156,6 +166,8 @@ def GUI():
             return markers
 
         def backtracking(matrix, markers, num_rows, num_cols, i, j):
+            if (stopFlag):
+                return None
             # looped through the entire matrix.
             if i == num_rows and j == num_cols:
                 return True
@@ -176,7 +188,7 @@ def GUI():
 
                 next_i, next_j = calc_next_indices(num_rows, num_cols, i, j)
                 status = backtracking(matrix, markers, num_rows, num_cols, next_i, next_j)
-                if status:
+                if status != False:
                     return status
 
                 set_cells(cells, markers, CellStatus.UNMARKED)#
@@ -191,20 +203,25 @@ def GUI():
 
                     next_i, next_j = calc_next_indices(num_rows, num_cols, i, j)
                     status = backtracking(matrix, markers, num_rows, num_cols, next_i, next_j)
-                    if status:
+                    if status != False:
                         return status
 
                     set_cells(sub_list['extracted'] + sub_list['remaining'], markers, CellStatus.UNMARKED)#
                     redraw(markers)
 
             return False
-
+        
         num_rows, num_cols = len(matrix), len(matrix[0])
         markers = create_markers(matrix) #
         #threading.Thread(target=redraw, args=(markers)).start()
         redraw(markers)
         status = backtracking(matrix, markers, num_rows, num_cols, 0, 0)
-        if not status:
+        changeAllButtonState(NORMAL)
+        if status == False:
+            warning.config(text='No solution for {}'.format(algoMode[curMode]), fg='green')
+            return None
+        elif status == None:
+            warning.config(text='Stop {}'.format(algoMode[curMode]), fg='red')
             return None
         #threading.Thread(target=redraw, args=(markers)).start()
         redraw(markers)
@@ -220,9 +237,12 @@ def GUI():
     ################################################################################
 
     def handleRunAlgo(): # Run algorithm to solve the puzzle
+        nonlocal stopFlag
+        stopFlag = False
         if (curMode == -1):
             warning.config(text='Please select an algorithm!!!', fg='red')
         else:
+            changeAllButtonState(DISABLED)
             if (len(matrix) == 0):
                 warning.config(text='Please load the puzzle first!!!', fg='red')
                 return
@@ -255,10 +275,17 @@ def GUI():
     def handleClear(): # Clear puzzle
         warning.config(text='Clearing puzzle .....', fg='blue')
         nonlocal matrix
+        nonlocal stopFlag
+        stopFlag = True
         for widget in array.winfo_children():
             widget.destroy()
         matrix.clear()
         warning.config(text='Clear puzzle successfully', fg='green')
+        return
+    
+    def handleStop():
+        nonlocal stopFlag
+        stopFlag = True
         return
 
     # Command frame
@@ -279,6 +306,9 @@ def GUI():
 
     clearButton = tk.Button(topRight, text='Clear Puzzle', fg='black', command=handleClear, width=13)
     clearButton.pack(pady=5)
+
+    stopButton = tk.Button(topRight, text="Stop", fg='black', command=handleStop, width=13)
+    stopButton.pack(pady=5)
 
     credit = tk.Button(topRight, text='Credit', fg='black', command=handleCredit, width=13)
     credit.pack(pady=5)

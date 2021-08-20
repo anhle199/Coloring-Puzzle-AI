@@ -16,10 +16,14 @@ def GUI():
     root.title("Coloring Puzzle - AI HCMUS")
 
     # General Frame
-    top = tk.LabelFrame(root, text="Command")
-    top.pack(pady=10)
+    control = tk.Frame(root)
+    control.pack(padx=10, side=RIGHT)
+    top = tk.LabelFrame(control, text="Command")
+    top.pack(padx=10, pady=10)
+    creditFrame = tk.LabelFrame(control, text="Credit")
+    creditFrame.pack(padx=10, pady=10, fill=X)
     bot = tk.LabelFrame(root, text="Puzzle")
-    bot.pack(fill=BOTH, expand=True, padx=10, pady=10)
+    bot.pack(fill=BOTH, expand=True, padx=5, pady=10, side=LEFT)
     foot = tk.Frame(bot)
     foot.pack(fill=X, side=BOTTOM)
     right = tk.Frame(bot)
@@ -30,6 +34,7 @@ def GUI():
     curMode = -1
     matrix = []
     stopFlag = False
+    rtFlag = False
 
     # Function in GUI
     def handleGetFile():  # Get file's path
@@ -39,29 +44,19 @@ def GUI():
             filePath.insert(0, path)
         return
 
-    def handleCredit():  # Show credit information
-        popup = tk.Tk()
-        popup.title("Credit")
-        creditText = tk.Label(
-            popup, text="Project 2: Coloring Puzzle", font=("Arial", 15)
-        )
-        creditText.pack(padx=10, pady=10)
-        creditTextBody1 = tk.Label(popup, text="Programmed by:", font=("Arial", 10))
-        creditTextBody1.pack()
-        creditTextBody2 = tk.Label(
-            popup,
-            text="Nguyen Hua Hung - 19127150\nLe Minh Huy - 19127157\nLe Hoang Anh - 19127329",
-        )
-        creditTextBody2.pack(padx=10, pady=5)
-        creditTextFooter = tk.Label(
-            popup, text="University Of Science - HCM City", font=("Arial", 10)
-        )
-        creditTextFooter.pack(padx=10, pady=10)
-        popup.geometry(
-            "300x200+%d+%d"
-            % (root.winfo_screenwidth() / 2 - 150, root.winfo_screenheight() / 2 - 100)
-        )
-        return
+    # def handleCredit(): # Show credit information
+    #     popup = tk.Tk()
+    #     popup.title('Credit')
+    #     creditText = tk.Label(popup, text='Project 2: Coloring Puzzle', font=('Arial', 15))
+    #     creditText.pack(padx=10, pady=10)
+    #     creditTextBody1 = tk.Label(popup, text='Programmed by:', font=('Arial', 10))
+    #     creditTextBody1.pack()
+    #     creditTextBody2 = tk.Label(popup, text='Nguyen Hua Hung - 19127150\nLe Minh Huy - 19127157\nLe Hoang Anh - 19127329')
+    #     creditTextBody2.pack(padx=10, pady=5)
+    #     creditTextFooter = tk.Label(popup, text='University Of Science - HCM City', font=('Arial', 10))
+    #     creditTextFooter.pack(padx=10, pady=10)
+    #     popup.geometry('300x200+%d+%d' % (root.winfo_screenwidth() / 2 - 150, root.winfo_screenheight() / 2 - 100))
+    #     return
 
     def handleDisplayArray():  # Load puzzle array
         nonlocal matrix
@@ -329,22 +324,39 @@ def GUI():
             run = False
 
             if curMode == Algorithm.PYSAT:
-                model = pysat_algo.solve(matrix)
-                changeAllButtonState(NORMAL)
-                run = True
-            elif curMode == Algorithm.A_STAR:
-                warning.config(
-                    text="{} has not been implemented yet".format(algoMode[curMode]),
-                    fg="red",
-                )
-                changeAllButtonState(NORMAL)
-            elif curMode == Algorithm.BRUTE_FORCE:
-                # model = brute_force.solve(matrix)
-                threading.Thread(target=run_brute_force_realtime).start()
-                # run = True
-            elif curMode == Algorithm.BACKTRACKING:
-                threading.Thread(target=run_backtracking_realtime).start()
-                # run = True
+# <<<<<<< hung
+#                 model = pysat_solution.solve(matrix)
+#                 changeAllButtonState(NORMAL)
+#                 run = True
+#             elif curMode == Algorithm.A_STAR:
+#                 warning.config(text='{} has not been implemented yet'.format(algoMode[curMode]), fg='red')
+# =======
+#                 model = pysat_algo.solve(matrix)
+#                 changeAllButtonState(NORMAL)
+#                 run = True
+#             elif curMode == Algorithm.A_STAR:
+#                 warning.config(
+#                     text="{} has not been implemented yet".format(algoMode[curMode]),
+#                     fg="red",
+#                 )
+# >>>>>>> master
+#                 changeAllButtonState(NORMAL)
+#             elif curMode == Algorithm.BRUTE_FORCE:
+#                 # model = brute_force.solve(matrix)
+#                 threading.Thread(target=run_brute_force_realtime).start()
+#                 # run = True
+#             elif curMode == Algorithm.BACKTRACKING:
+# <<<<<<< hung
+#                 if (rtFlag):
+#                     threading.Thread(target=run_backtracking).start()
+#                 else:
+#                     model = solve(matrix)
+#                     changeAllButtonState(NORMAL)
+#                     run = True
+# =======
+#                 threading.Thread(target=run_backtracking_realtime).start()
+#                 # run = True
+# >>>>>>> master
             if run == True:
                 if model == None:
                     warning.config(
@@ -379,6 +391,16 @@ def GUI():
         nonlocal stopFlag
         stopFlag = True
         return
+    
+    def handleRealtime():
+        nonlocal rtFlag
+        if rtFlag:
+            rtFlag = False
+            realtimeToggle.config(text="Realtime: OFF")
+        else:
+            rtFlag = True
+            realtimeToggle.config(text="Realtime: ON")
+        return
 
     # Command frame
     topLeft = tk.Frame(top, width=200, height=100)
@@ -410,10 +432,18 @@ def GUI():
     )
     stopButton.pack(pady=5)
 
-    credit = tk.Button(
-        topRight, text="Credit", fg="black", command=handleCredit, width=13
-    )
-    credit.pack(pady=5)
+# <<<<<<< hung
+#     realtimeToggle = tk.Button(topRight, text="Realtime: OFF", fg='black', command=handleRealtime, width=13)
+#     realtimeToggle.pack(pady=5)
+
+#     # credit = tk.Button(topRight, text='Credit', fg='black', command=handleCredit, width=13)
+#     # credit.pack(pady=5)
+# =======
+#     credit = tk.Button(
+#         topRight, text="Credit", fg="black", command=handleCredit, width=13
+#     )
+#     credit.pack(pady=5)
+# >>>>>>> master
 
     # Area for display data
     canvas = tk.Canvas(bot)
@@ -469,8 +499,18 @@ def GUI():
     warning = tk.Label(mid, text="None", fg="black")
     warning.pack(padx=5, pady=5)
 
+    # Credit
+    creditText = tk.Label(creditFrame, text='Project 2: Coloring Puzzle', font=('Arial', 15))
+    creditText.pack(padx=10, pady=10)
+    creditTextBody1 = tk.Label(creditFrame, text='Programmed by:', font=('Arial', 10))
+    creditTextBody1.pack()
+    creditTextBody2 = tk.Label(creditFrame, text='Nguyen Hua Hung - 19127150\nLe Minh Huy - 19127157\nLe Hoang Anh - 19127329')
+    creditTextBody2.pack(padx=10, pady=5)
+    creditTextFooter = tk.Label(creditFrame, text='University Of Science - HCM City', font=('Arial', 10))
+    creditTextFooter.pack(padx=10, pady=10)
+
     # main window size
-    width = 1000 if root.winfo_screenwidth() > 1000 else root.winfo_screenwidth()
+    width = 1500 if root.winfo_screenwidth() > 1500 else root.winfo_screenwidth()
     height = 900 if root.winfo_screenheight() > 900 else root.winfo_screenheight()
     root.geometry(
         "%dx%d+%d+%d"

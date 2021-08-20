@@ -16,8 +16,12 @@ def GUI():
     root.title('Coloring Puzzle - AI HCMUS')
 
     # General Frame
-    top = tk.LabelFrame(root, text="Command")
-    top.pack(padx=10, side=RIGHT)
+    control = tk.Frame(root)
+    control.pack(padx=10, side=RIGHT)
+    top = tk.LabelFrame(control, text="Command")
+    top.pack(padx=10, pady=10)
+    creditFrame = tk.LabelFrame(control, text="Credit")
+    creditFrame.pack(padx=10, pady=10, fill=X)
     bot = tk.LabelFrame(root, text="Puzzle")
     bot.pack(fill=BOTH, expand=True, padx=5, pady=10, side=LEFT)
     foot = tk.Frame(bot)
@@ -40,19 +44,19 @@ def GUI():
             filePath.insert(0, path)
         return
 
-    def handleCredit(): # Show credit information
-        popup = tk.Tk()
-        popup.title('Credit')
-        creditText = tk.Label(popup, text='Project 2: Coloring Puzzle', font=('Arial', 15))
-        creditText.pack(padx=10, pady=10)
-        creditTextBody1 = tk.Label(popup, text='Programmed by:', font=('Arial', 10))
-        creditTextBody1.pack()
-        creditTextBody2 = tk.Label(popup, text='Nguyen Hua Hung - 19127150\nLe Minh Huy - 19127157\nLe Hoang Anh - 19127329')
-        creditTextBody2.pack(padx=10, pady=5)
-        creditTextFooter = tk.Label(popup, text='University Of Science - HCM City', font=('Arial', 10))
-        creditTextFooter.pack(padx=10, pady=10)
-        popup.geometry('300x200+%d+%d' % (root.winfo_screenwidth() / 2 - 150, root.winfo_screenheight() / 2 - 100))
-        return
+    # def handleCredit(): # Show credit information
+    #     popup = tk.Tk()
+    #     popup.title('Credit')
+    #     creditText = tk.Label(popup, text='Project 2: Coloring Puzzle', font=('Arial', 15))
+    #     creditText.pack(padx=10, pady=10)
+    #     creditTextBody1 = tk.Label(popup, text='Programmed by:', font=('Arial', 10))
+    #     creditTextBody1.pack()
+    #     creditTextBody2 = tk.Label(popup, text='Nguyen Hua Hung - 19127150\nLe Minh Huy - 19127157\nLe Hoang Anh - 19127329')
+    #     creditTextBody2.pack(padx=10, pady=5)
+    #     creditTextFooter = tk.Label(popup, text='University Of Science - HCM City', font=('Arial', 10))
+    #     creditTextFooter.pack(padx=10, pady=10)
+    #     popup.geometry('300x200+%d+%d' % (root.winfo_screenwidth() / 2 - 150, root.winfo_screenheight() / 2 - 100))
+    #     return
 
     def handleDisplayArray(): # Load puzzle array
         nonlocal matrix
@@ -330,8 +334,8 @@ def GUI():
     realtimeToggle = tk.Button(topRight, text="Realtime: OFF", fg='black', command=handleRealtime, width=13)
     realtimeToggle.pack(pady=5)
 
-    credit = tk.Button(topRight, text='Credit', fg='black', command=handleCredit, width=13)
-    credit.pack(pady=5)
+    # credit = tk.Button(topRight, text='Credit', fg='black', command=handleCredit, width=13)
+    # credit.pack(pady=5)
 
     # Area for display data
     canvas = tk.Canvas(bot)
@@ -374,6 +378,16 @@ def GUI():
     mid.pack(side=BOTTOM, fill=X)
     warning = tk.Label(mid, text='None', fg='black')
     warning.pack(padx=5, pady=5)
+
+    # Credit
+    creditText = tk.Label(creditFrame, text='Project 2: Coloring Puzzle', font=('Arial', 15))
+    creditText.pack(padx=10, pady=10)
+    creditTextBody1 = tk.Label(creditFrame, text='Programmed by:', font=('Arial', 10))
+    creditTextBody1.pack()
+    creditTextBody2 = tk.Label(creditFrame, text='Nguyen Hua Hung - 19127150\nLe Minh Huy - 19127157\nLe Hoang Anh - 19127329')
+    creditTextBody2.pack(padx=10, pady=5)
+    creditTextFooter = tk.Label(creditFrame, text='University Of Science - HCM City', font=('Arial', 10))
+    creditTextFooter.pack(padx=10, pady=10)
 
     # main window size
     width = 1500 if root.winfo_screenwidth() > 1500 else root.winfo_screenwidth()

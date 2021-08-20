@@ -1,7 +1,7 @@
 from utilities.combination_algos import generate_combination
-from utilities.util_funcs import get_cells, set_cells, create_markers, calc_no
+from utilities.util_funcs import get_cells, set_cells, create_markers, calc_no, count_cells_marked
 from utilities.constants import CellStatus
-from brute_force import count_cells_marked
+from brute_force_algo import count_cells_marked
 
 
 def get_all_indices(matrix):
@@ -45,21 +45,6 @@ def backtracking(matrix, markers, num_rows, num_cols, indices, i):
             set_cells(sub_list['extracted'] + sub_list['remaining'], markers, CellStatus.UNMARKED)
 
     return False
-
-def count_cells_marked(markers, i, j):
-    num_rows = len(markers)
-    row_start = i - 1 if i > 0 else i
-    row_end = i + 1 if i < num_rows - 1 else i
-    col_start = j - 1 if j > 0 else j
-    col_end = j + 1 if j < len(markers[0]) - 1 else j
-
-    count = 0
-    for row in range(row_start, row_end + 1):
-        for col in range(col_start, col_end + 1):
-            if markers[row][col] == CellStatus.MARKED:
-                count += 1
-
-    return count
 
 
 def solve(matrix):

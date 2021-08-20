@@ -30,7 +30,7 @@ def GUI():
     right.pack(fill=Y, side=RIGHT)
 
     # variables for using
-    algoMode = ["PySat", "A Star", "BruteForce", "Backtracking", "None"]
+    algoMode = ["PySat", "A Star", "Brute Force", "Backtracking", "None"]
     curMode = -1
     matrix = []
     stopFlag = False
@@ -105,11 +105,6 @@ def GUI():
             ("A Star", "1"),
             ("Brute Force", "2"),
             ("Backtracking", "3")
-            # ('None', Algorithm.PYSAT),
-            # ('PySat', Algorithm.PYSAT),
-            # ('A Star', Algorithm.A_STAR),
-            # ('BruteForce', Algorithm.BRUTE_FORCE),
-            # ('Backtracking', Algorithm.BACKTRACKING)
         )
 
         def onClick():
@@ -122,19 +117,10 @@ def GUI():
             popup.destroy()
 
         for i, item in zip(range(len(values)), values):
-            tk.Radiobutton(
-                optionWrapper,
-                text=item[0],
-                variable=mode,
-                value=item[1],
-                command=onClick,
-            ).grid(row=0, column=i)
+            tk.Radiobutton(optionWrapper, text=item[0], variable=mode, value=item[1], command=onClick,).grid(row=0, column=i)
         confirmButton = tk.Button(popup, text="Confirm", command=handleConfirm)
         confirmButton.pack(side=RIGHT, padx=10)
-        popup.geometry(
-            "450x150+%d+%d"
-            % (root.winfo_screenwidth() / 2 - 225, root.winfo_screenheight() / 2 - 75)
-        )
+        popup.geometry("450x150+%d+%d" % (root.winfo_screenwidth() / 2 - 225, root.winfo_screenheight() / 2 - 75))
         return
 
     def renew():
@@ -231,11 +217,12 @@ def GUI():
         try:
             path = filePath.get().split('/')
             path[-1] = 'backtracking_output.txt'
+            msg = 'Output file: ' + path[-1]
             write_file('/' + '/'.join(path), model, len(matrix), len(matrix[0]))
         except ValueError:
-            print('Can not write data to file!!!')
+            msg = 'Can not write data to file!!!'
 
-        warning.config(text="Run {} successfully".format(algoMode[curMode]), fg="green")
+        warning.config(text="Run {} successfully\n{}".format(algoMode[curMode], msg), fg="green")
         return
     ########################################################################################
 
@@ -301,11 +288,12 @@ def GUI():
         try:
             path = filePath.get().split('/')
             path[-1] = 'brute_force_output.txt'
+            msg = 'Output file: ' + path[-1]
             write_file('/' + '/'.join(path), model, len(matrix), len(matrix[0]))
         except ValueError:
-            print('Can not write data to file!!!')
+            msg = 'Can not write data to file!!!'
 
-        warning.config(text="Run {} successfully".format(algoMode[curMode]), fg="green")
+        warning.config(text="Run {} successfully\n{}".format(algoMode[curMode], msg), fg="green")
         return
     ########################################################################################
 
@@ -354,14 +342,15 @@ def GUI():
                         algo_names = ['pysat', 'a_star', 'brute_force', 'backtracking']
                         path = filePath.get().split('/')
                         path[-1] = algo_names[curMode] + '_output.txt'
+                        msg = 'Output file: ' + path[-1]
                         write_file('/' + '/'.join(path), model, len(matrix), len(matrix[0]))
                     except ValueError:
-                        print('Can not write data to file!!!')
+                        msg = 'Can not write data to file!!!'
 
                     for widget, num in zip(array.winfo_children(), model):
                         color = "green" if num > 0 else "red"
                         widget.config(bg=color, fg="white")
-                    warning.config(text="Run {} successfully".format(algoMode[curMode]), fg="green")
+                    warning.config(text="Run {} successfully\n{}".format(algoMode[curMode], msg), fg="green")
 
         return
 
@@ -398,27 +387,19 @@ def GUI():
     topRight.pack(side=RIGHT, padx=10)
 
     # Command button (TOP RIGHT)
-    chooseFile = tk.Button(
-        topRight, text="Choose File", fg="black", command=handleGetFile, width=13
-    )
+    chooseFile = tk.Button(topRight, text="Choose File", fg="black", command=handleGetFile, width=13)
     chooseFile.pack(pady=5)
 
-    okButton = tk.Button(
-        topRight, text="Load Puzzle", fg="black", command=handleDisplayArray, width=13
-    )
+    okButton = tk.Button(topRight, text="Load Puzzle", fg="black", command=handleDisplayArray, width=13)
     okButton.pack(pady=5)
 
     runButton = tk.Button(topRight, text="Run", command=handleRunAlgo, width=13)
     runButton.pack(pady=5)
 
-    clearButton = tk.Button(
-        topRight, text="Clear Puzzle", fg="black", command=handleClear, width=13
-    )
+    clearButton = tk.Button(topRight, text="Clear Puzzle", fg="black", command=handleClear, width=13)
     clearButton.pack(pady=5)
 
-    stopButton = tk.Button(
-        topRight, text="Stop", fg="black", command=handleStop, width=13
-    )
+    stopButton = tk.Button(topRight, text="Stop", fg="black", command=handleStop, width=13)
     stopButton.pack(pady=5)
 
     realtimeToggle = tk.Button(topRight, text="Realtime: OFF", fg='black', command=handleRealtime, width=13)
@@ -434,12 +415,8 @@ def GUI():
     array = tk.Frame(canvas)
 
     # Bind event for scroll
-    canvas.bind(
-        "<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
-    )
-    array.bind(
-        "<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
-    )
+    canvas.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+    array.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
 
     def scrollWithMouse(event):
         canvas.yview_scroll(int(-1 * (event.delta / ScrollConst.MODIFIER)), "units")
@@ -463,13 +440,7 @@ def GUI():
     algoTitle.pack(side=LEFT)
     algoSelected = tk.Label(algoBlock, text="{}".format(algoMode[curMode]), fg="blue")
     algoSelected.pack(side=LEFT)
-    algoButton = tk.Button(
-        algoBlock,
-        text="Select Algorithm",
-        fg="black",
-        command=handleSelectAlgo,
-        width=13,
-    )
+    algoButton = tk.Button(algoBlock, text="Select Algorithm", fg="black", command=handleSelectAlgo, width=13)
     algoButton.pack(side=RIGHT, pady=10)
 
     # Notification while running
@@ -491,14 +462,6 @@ def GUI():
     # main window size
     width = 1500 if root.winfo_screenwidth() > 1500 else root.winfo_screenwidth()
     height = 900 if root.winfo_screenheight() > 900 else root.winfo_screenheight()
-    root.geometry(
-        "%dx%d+%d+%d"
-        % (
-            width,
-            height,
-            root.winfo_screenwidth() / 2 - width / 2,
-            root.winfo_screenheight() / 2 - height / 2,
-        )
-    )
+    root.geometry("%dx%d+%d+%d" % (width, height, root.winfo_screenwidth() / 2 - width / 2, root.winfo_screenheight() / 2 - height / 2))
     root.update()
     root.mainloop()

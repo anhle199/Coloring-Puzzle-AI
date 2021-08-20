@@ -25,8 +25,3 @@ class ScrollConst:
     MODIFIER = 120
     if platform.system() == 'Darwin':
         MODIFIER = 1
-
-class FilePath:
-    SLASH = ''
-    if platform.system() == 'Darwin':
-        SLASH = '/'

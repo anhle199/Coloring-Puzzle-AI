@@ -3,8 +3,10 @@ from tkinter.constants import BOTH, BOTTOM, DISABLED, LEFT, NORMAL, RIGHT, TOP, 
 from tkinter.filedialog import askopenfilename
 from utilities.file_io import *
 from utilities.constants import CellStatus, CellSize, Algorithm, ScrollConst
+from utilities.util_funcs import create_markers, calc_next_indices, cell_to_indices
+from utilities.combination_algos import generate_combination
 import pysat_solution
-import backtracking
+from backtracking import backtracking
 import brute_force
 
 
@@ -120,6 +122,81 @@ def GUI():
         popup.geometry('450x150+%d+%d' % (root.winfo_screenwidth() / 2 - 225, root.winfo_screenheight() / 2 - 75))
         return
 
+    ########################################################################
+    def set_cells(cells, markers, val):
+        num_rows, num_cols = len(markers), len(markers[0])
+        for num in cells:
+            row, col = cell_to_indices(num, num_rows, num_cols)
+            markers[row][col] = val
+
+    def run_backtracking():
+        def create_markers(matrix):
+            markers = [[CellStatus.UNMARKED for _ in range(len(matrix[0]))] for _ in range(len(matrix))]
+            for i in range(len(matrix)):
+                for j in range(len(matrix[i])):
+                    if matrix[i][j] == 0:
+                        num_rows = len(matrix)
+                        row_start = i - 1 if i > 0 else i
+                        row_end = i + 1 if i < num_rows - 1 else i
+                        col_start = j - 1 if j > 0 else j
+                        col_end = j + 1 if j < len(matrix[0]) - 1 else j
+
+                        for row in range(row_start, row_end + 1):
+                            for col in range(col_start, col_end + 1):
+                                markers[row][col] = CellStatus.BANNED
+            return markers
+
+        def backtracking(matrix, markers, num_rows, num_cols, i, j):
+            # looped through the entire matrix.
+            if i == num_rows and j == num_cols:
+                return True
+
+            # empty cell or cell banned.
+            if matrix[i][j] == -1 or matrix[i][j] == 0:
+                next_i, next_j = calc_next_indices(num_rows, num_cols, i, j)
+                return backtracking(matrix, markers, num_rows, num_cols, next_i, next_j)
+
+            cells, max_cells = get_cells(matrix, markers, i, j)
+            k = matrix[i][j] - (max_cells - len(cells))  # number of remaining cells that can color adjacent matrix[i][j] cell.
+            if k == 0:
+                set_cells(cells, markers, CellStatus.BANNED)#
+
+                next_i, next_j = calc_next_indices(num_rows, num_cols, i, j)
+                status = backtracking(matrix, markers, num_rows, num_cols, next_i, next_j)
+                if status:
+                    return status
+
+                set_cells(cells, markers, CellStatus.UNMARKED)#
+            else:
+                combination_list = generate_combination(cells, len(cells), k)
+                for sub_list in combination_list:
+                    set_cells(sub_list['extracted'], markers, CellStatus.MARKED)#
+                    set_cells(sub_list['remaining'], markers, CellStatus.BANNED)#
+
+                    next_i, next_j = w(num_rows, num_cols, i, j)
+                    status = backtracking(matrix, markers, num_rows, num_cols, next_i, next_j)
+                    if status:
+                        return status
+
+                    set_cells(sub_list['extracted'] + sub_list['remaining'], markers, CellStatus.UNMARKED)#
+
+            return False
+
+        num_rows, num_cols = len(matrix), len(matrix[0])
+        markers = create_markers(matrix) #
+        status = backtracking(matrix, markers, num_rows, num_cols, 0, 0)
+        if not status:
+            return None
+
+        model = [-num for num in range(1, num_rows * num_cols + 1)]
+        for i in range(num_rows):
+            for j in range(num_cols):
+                if markers[i][j] == CellStatus.MARKED:
+                    model[(num_rows * i) + j] = -model[(num_rows * i) + j]
+
+        return model
+    ################################################################################
+
     def handleRunAlgo(): # Run algorithm to solve the puzzle
         if (curMode == -1):
             warning.config(text='Please select an algorithm!!!', fg='red')
@@ -140,7 +217,7 @@ def GUI():
                 model = brute_force.solve(matrix)
                 run = True
             elif curMode == Algorithm.BACKTRACKING:
-                model = backtracking.solve(matrix)
+                model = run_backtracking()
                 run = True
             if run == True:
                 if model == None:

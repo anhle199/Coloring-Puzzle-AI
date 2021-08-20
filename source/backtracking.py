@@ -16,26 +16,26 @@ def backtracking(matrix, markers, num_rows, num_cols, i, j):
     cells, max_cells = get_cells(matrix, markers, i, j)
     k = matrix[i][j] - (max_cells - len(cells))  # number of remaining cells that can color adjacent matrix[i][j] cell.
     if k == 0:
-        set_cells(cells, markers, CellStatus.BANNED)
+        set_cells(cells, markers, CellStatus.BANNED)#
 
         next_i, next_j = calc_next_indices(num_rows, num_cols, i, j)
         status = backtracking(matrix, markers, num_rows, num_cols, next_i, next_j)
         if status:
             return status
 
-        set_cells(cells, markers, CellStatus.UNMARKED)
+        set_cells(cells, markers, CellStatus.UNMARKED)#
     else:
         combination_list = generate_combination(cells, len(cells), k)
         for sub_list in combination_list:
-            set_cells(sub_list['extracted'], markers, CellStatus.MARKED)
-            set_cells(sub_list['remaining'], markers, CellStatus.BANNED)
+            set_cells(sub_list['extracted'], markers, CellStatus.MARKED)#
+            set_cells(sub_list['remaining'], markers, CellStatus.BANNED)#
 
             next_i, next_j = calc_next_indices(num_rows, num_cols, i, j)
             status = backtracking(matrix, markers, num_rows, num_cols, next_i, next_j)
             if status:
                 return status
 
-            set_cells(sub_list['extracted'] + sub_list['remaining'], markers, CellStatus.UNMARKED)
+            set_cells(sub_list['extracted'] + sub_list['remaining'], markers, CellStatus.UNMARKED)#
 
     return False
 

@@ -6,7 +6,7 @@ from utilities.constants import CellStatus, CellSize, Algorithm, ScrollConst
 from utilities.util_funcs import create_markers, calc_next_indices, cell_to_indices, get_cells
 from utilities.combination_algos import generate_combination
 import pysat_solution
-from backtracking import backtracking, count_cells_marked
+from backtracking import backtracking, count_cells_marked, solve
 import brute_force
 import threading
 
@@ -17,9 +17,9 @@ def GUI():
 
     # General Frame
     top = tk.LabelFrame(root, text="Command")
-    top.pack(pady=10)
+    top.pack(padx=10, side=RIGHT)
     bot = tk.LabelFrame(root, text="Puzzle")
-    bot.pack(fill=BOTH, expand=True, padx=10, pady=10)
+    bot.pack(fill=BOTH, expand=True, padx=5, pady=10, side=LEFT)
     foot = tk.Frame(bot)
     foot.pack(fill=X, side=BOTTOM)
     right = tk.Frame(bot)
@@ -30,6 +30,7 @@ def GUI():
     curMode = -1
     matrix = []
     stopFlag = False
+    rtFlag = False
 
     # Function in GUI
     def handleGetFile(): # Get file's path
@@ -252,15 +253,21 @@ def GUI():
             run = False
             if curMode == Algorithm.PYSAT:
                 model = pysat_solution.solve(matrix)
+                changeAllButtonState(NORMAL)
                 run = True
             elif curMode == Algorithm.A_STAR:
                 warning.config(text='{} has not been implemented yet'.format(algoMode[curMode]), fg='red')
+                changeAllButtonState(NORMAL)
             elif curMode == Algorithm.BRUTE_FORCE:
                 model = brute_force.solve(matrix)
                 run = True
             elif curMode == Algorithm.BACKTRACKING:
-                threading.Thread(target=run_backtracking).start()
-                #run = True
+                if (rtFlag):
+                    threading.Thread(target=run_backtracking).start()
+                else:
+                    model = solve(matrix)
+                    changeAllButtonState(NORMAL)
+                    run = True
             if run == True:
                 if model == None:
                     warning.config(text='No solution with {}'.format(algoMode[curMode]), fg='green')
@@ -287,6 +294,16 @@ def GUI():
         nonlocal stopFlag
         stopFlag = True
         return
+    
+    def handleRealtime():
+        nonlocal rtFlag
+        if rtFlag:
+            rtFlag = False
+            realtimeToggle.config(text="Realtime: OFF")
+        else:
+            rtFlag = True
+            realtimeToggle.config(text="Realtime: ON")
+        return
 
     # Command frame
     topLeft = tk.Frame(top, width=200, height=100)
@@ -309,6 +326,9 @@ def GUI():
 
     stopButton = tk.Button(topRight, text="Stop", fg='black', command=handleStop, width=13)
     stopButton.pack(pady=5)
+
+    realtimeToggle = tk.Button(topRight, text="Realtime: OFF", fg='black', command=handleRealtime, width=13)
+    realtimeToggle.pack(pady=5)
 
     credit = tk.Button(topRight, text='Credit', fg='black', command=handleCredit, width=13)
     credit.pack(pady=5)
@@ -356,7 +376,7 @@ def GUI():
     warning.pack(padx=5, pady=5)
 
     # main window size
-    width = 1000 if root.winfo_screenwidth() > 1000 else root.winfo_screenwidth()
+    width = 1500 if root.winfo_screenwidth() > 1500 else root.winfo_screenwidth()
     height = 900 if root.winfo_screenheight() > 900 else root.winfo_screenheight()
     root.geometry('%dx%d+%d+%d' % (width, height, root.winfo_screenwidth() / 2 - width / 2, root.winfo_screenheight() / 2 - height / 2))
     root.update()

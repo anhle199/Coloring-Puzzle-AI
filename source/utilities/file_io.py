@@ -1,3 +1,5 @@
+from utilities.util_funcs import model_to_markers
+
 def read_file(file_path):
     try:
         reader = open(file_path, 'r')
@@ -19,14 +21,12 @@ def read_file(file_path):
     return matrix
 
 
-def write_file(file_path, matrix):
+def write_file(file_path, model, num_rows, num_cols):
     try:
         writer = open(file_path, 'w')
 
-        num_rows = len(matrix)
-        num_cols = len(matrix[0])
         writer.write(str(num_rows) + ' ' + str(num_cols))
-        writer.writelines(['\n' + ' '.join(row) for row in matrix])
+        writer.writelines(['\n' + ' '.join(row) for row in model_to_markers(model, num_rows, num_cols)])
         writer.close()
     except:
         raise ValueError('Can not write data to file!!!')

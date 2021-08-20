@@ -1,7 +1,5 @@
 from utilities.constants import CellStatus
 
-# def validate_matrix(matrix):
-
 
 def negate(numbers):
     return [-num for num in numbers]
@@ -9,6 +7,41 @@ def negate(numbers):
 
 def calc_no(i, j, num_rows):
     return (num_rows * i) + j + 1
+
+
+def model_to_markers(model, num_rows, num_cols):
+    markers = []
+    for i in range(num_rows):
+        markers.append([])
+        for j in range(num_cols):
+            num = calc_no(i, j, num_rows)
+            markers[-1].append(CellStatus.MARKED if num > 0 else CellStatus.UNMARKED)
+    return markers
+
+
+def count_cells_marked(markers, i, j):
+    num_rows = len(markers)
+    row_start = i - 1 if i > 0 else i
+    row_end = i + 1 if i < num_rows - 1 else i
+    col_start = j - 1 if j > 0 else j
+    col_end = j + 1 if j < len(markers[0]) - 1 else j
+
+    count = 0
+    for row in range(row_start, row_end + 1):
+        for col in range(col_start, col_end + 1):
+            if markers[row][col] == CellStatus.MARKED:
+                count += 1
+
+    return count
+
+
+def validate(matrix, markers, num_rows, num_cols):
+    for i in range(num_rows):
+        for j in range(num_cols):
+            if matrix[i][j] != -1:
+                if count_cells_marked(markers, i, j) != matrix[i][j]:
+                    return False
+    return True
 
 
 def calc_next_indices(num_rows, num_cols, i, j):
@@ -44,11 +77,16 @@ def get_cells(matrix, markers, i, j):
     count = 0
     for row in range(row_start, row_end + 1):
         for col in range(col_start, col_end + 1):
-            if markers[row][col] != CellStatus.BANNED:
+            if markers[row][col] == CellStatus.UNMARKED:
+                cell = calc_no(row, col, num_rows)
+                cells.append(cell)
+            elif markers[row][col] == CellStatus.MARKED:
                 count += 1
-                if markers[row][col] == CellStatus.UNMARKED:
-                    cell = calc_no(row, col, num_rows)
-                    cells.append(cell)
+            # if markers[row][col] != CellStatus.BANNED:
+            #     count += 1
+            #     if markers[row][col] == CellStatus.UNMARKED:
+            #         cell = calc_no(row, col, num_rows)
+            #         cells.append(cell)
 
     return cells, count
 

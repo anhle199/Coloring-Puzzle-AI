@@ -1,4 +1,3 @@
-# from utilities.combination_algos import generate_combination
 from utilities.util_funcs import create_markers, calc_next_indices, set_cells, calc_no, count_cells_marked, validate
 from utilities.constants import CellStatus
 

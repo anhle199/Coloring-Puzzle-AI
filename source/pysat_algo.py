@@ -1,4 +1,3 @@
-import copy
 from pysat.solvers import Glucose3
 from utilities.combination_algos import generate_combination
 from utilities.util_funcs import calc_no, get_cells, negate, create_markers, remove_duplicate_clauses
@@ -55,6 +54,6 @@ def solve(matrix):
     g = Glucose3()
     for clause in clauses:
         g.add_clause([number for number in clause])
-    print()
+
     status = g.solve()
     return g.get_model() if status else None

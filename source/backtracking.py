@@ -46,6 +46,21 @@ def backtracking(matrix, markers, num_rows, num_cols, indices, i):
 
     return False
 
+def count_cells_marked(markers, i, j):
+    num_rows = len(markers)
+    row_start = i - 1 if i > 0 else i
+    row_end = i + 1 if i < num_rows - 1 else i
+    col_start = j - 1 if j > 0 else j
+    col_end = j + 1 if j < len(markers[0]) - 1 else j
+
+    count = 0
+    for row in range(row_start, row_end + 1):
+        for col in range(col_start, col_end + 1):
+            if markers[row][col] == CellStatus.MARKED:
+                count += 1
+
+    return count
+
 
 def solve(matrix):
     num_rows, num_cols = len(matrix), len(matrix[0])

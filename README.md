@@ -43,6 +43,7 @@
 -   In this experiment, three algorithms are used except A\* because of incomplete implementation.
 -   All test cases are stored in file [test_cases.txt] with different sizes.
 
+
 |  Algorithms  |         |         |         |         |         |         |
 | :----------: | :-----: | :-----: | :-----: | :-----: | :-----: | :-----: |
 |              |   3x3   |   5x5   |   7x7   |   9x9   |  11x11  |  20x20  |
@@ -50,6 +51,11 @@
 | Backtracking | 0.00102 | 0.00199 | 0.00096 | 0.00099 | 0.00295 | 0.23636 |
 | Brute-force  | 0.01598 | timeout | timeout | timeout | timeout | timeout |
 
+
+
+## Demo
+
+-   Youtube: [Demo Project2 - Coloring Puzzle - Intro2AI](https://youtu.be/f-XEeLj0m8A)
 
 [pysat]: https://pysathq.github.io/installation.html
 [source]: ./source
